@@ -11,12 +11,14 @@ describe("Hero App Web Automation", () => {
         // Define and Encode the authentication string
         const authString = `${Cypress.env("username")}:${Cypress.env("password")}`;
         const encodedAuth = Buffer.from(authString).toString('base64')
+        const authorizedMsg = "Congratulations! You must have the proper credentials"
 
         // Preparing to intercept the /basic_auth request and add the auth header once we click on login
         cy.intercept('GET', '**/basic_auth', (req) => {
             req.headers['authorization'] = `Basic ${encodedAuth}`
         })
         HeroAppQuery.selectors('Basic Auth').click()
+        HeroAppQuery.selectors("authorizedMsg").should('contain', authorizedMsg)
     })
 
     it("Reusing DOM elements in between multiple windows", () =>{

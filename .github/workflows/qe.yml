@@ -51,4 +51,6 @@ jobs:
           CYPRESS_PROJECT_ID: ${{ secrets.CYPRESS_DASHBOARD_ID }}
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_DASHBOARD_KEY }}
           CYPRESS_TEST_TRIGGER: ${{github.event_name}}
+          CYPRESS_username: ${{ secrets.CYPRESS_username }}
+          CYPRESS_password: ${{ secrets.CYPRESS_password }}
           CYPRESS_envKey: ${{env.TEST_ENVIRONMENT}}
