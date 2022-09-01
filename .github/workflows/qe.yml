@@ -1,0 +1,54 @@
+name: QE Pipeline
+
+on:
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+    inputs:
+      env:
+        description: 'Environment to test'
+        required: true
+        default: 'dev'
+      
+      #Workaround while understanding deployment_status
+      deployment:
+        description: 'Auto Deployment'
+        required: true
+        default: 'no'
+
+jobs:
+  cypress-e2e:
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Repo Checkout
+        uses: actions/checkout@v3
+      
+      # Setting environment
+      - name: Set Up Environment
+        run: |
+          echo "TEST_ENVIRONMENT=${{ github.event.inputs.deployment == 'yes' && 'dev' || github.event.inputs.env}}" >> $GITHUB_ENV
+
+      # Run Test and Deploy
+      - name: Quality Gates
+        run: |
+          echo Running in ${{ env.TEST_ENVIRONMENT }}
+          echo Test, and deploy your project
+
+      #NPM Installation and Cypress execution
+      - name: Cypress Execution
+        uses: cypress-io/github-action@v4
+        with:
+          ci-build-id: '${{ github.job }}:${{ github.run_number }}-${{ github.run_attempt }}'
+          tag: '${{ github.job }}:${{ github.run_number }}-${{ github.run_attempt }}'
+          record: true
+          browser: chrome
+          headed: false
+          install: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CYPRESS_PROJECT_ID: ${{ secrets.CYPRESS_DASHBOARD_ID }}
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_DASHBOARD_KEY }}
+          CYPRESS_TEST_TRIGGER: ${{github.event_name}}
+          CYPRESS_envKey: ${{env.TEST_ENVIRONMENT}}
