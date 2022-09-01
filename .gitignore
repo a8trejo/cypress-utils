@@ -1,5 +1,6 @@
 node_modules
 
+cypress.env.json
 cypress/results
 cypress/fixtures/cypressEnv.json
 cypress/fixtures/cypressConfig.json

@@ -50,7 +50,9 @@ module.exports = defineConfig({
         "expandCollapseTime": 1500,
         "ACTION_TEST": "[SHOULD BE OVERWRITTEN]",
         "SeleniumEasy": "https://demo.seleniumeasy.com/",
-        "HeroApp": "https://the-internet.herokuapp.com/"
+        "HeroApp": "https://the-internet.herokuapp.com/",
+        "username": "[SHOULD BE OVERWRITTEN]",
+        "password": "[SHOULD BE OVERWRITTEN]"
     },
     setupNodeEvents,
   }
