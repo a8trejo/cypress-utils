@@ -1,0 +1,6 @@
+{
+    "baseUrl": "https://the-internet.herokuapp.com/",
+    "env":{
+        "TAGS": "not @admin"
+    }
+}
