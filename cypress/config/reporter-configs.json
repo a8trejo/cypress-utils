@@ -6,6 +6,7 @@
         "overwrite": false,
         "html": false,
         "json": true,
-        "timestamp": "HH:MM:ss,dd/mm/yyyy"
+        "timestamp": "HH:MM:ss,dd/mm/yyyy",
+        "consoleReporter": "none"
     }
   }
