@@ -34,7 +34,7 @@ module.exports = defineConfig({
     specPattern: ["cypress/e2e/**/*.cy.{js,jsx,ts,tsx}"],
     pageLoadTimeout: 90000,
     responseTimeout: 45000,
-    defaultCommandTimeout: 6000,
+    defaultCommandTimeout: 10000,
     video: true,
     chromeWebSecurity: false,
     screenshotsFolder: "cypress/results/screenshots",

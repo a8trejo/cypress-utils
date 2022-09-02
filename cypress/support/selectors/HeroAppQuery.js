@@ -8,6 +8,9 @@ class HeroAppQuery {
             case "window1Text": return cy.get(".example h3")
             case "window2Button": return cy.get(".example a")
             case "window2Text": return cy.get(".example h3")
+            case "inputForm": return cy.get(".example form")
+            case "inputBox": return cy.get("#target")
+            case "temporalMsg": return cy.get("p#result")
         }
     }
 }

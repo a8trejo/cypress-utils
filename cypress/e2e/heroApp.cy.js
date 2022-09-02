@@ -42,4 +42,20 @@ describe("Hero App Web Automation", () => {
             })
         })
     })
+
+    it("Preventing a form from submitting", () => {
+        cy.visit("/key_presses")
+        HeroAppQuery.selectors("inputBox").should("be.visible").and("be.enabled")
+        
+        // cy.get("form")
+        HeroAppQuery.selectors("inputForm").then(form$ => {
+            form$.on('submit', e => {
+              e.preventDefault()
+            })
+        })
+
+        // This {enter} by default submits the form, it wont after the above modification
+        HeroAppQuery.selectors("inputBox").type("{enter}")
+        HeroAppQuery.selectors("temporalMsg").should('contain', "You entered: ENTER")
+    })
 })
