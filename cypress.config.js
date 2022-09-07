@@ -1,32 +1,8 @@
 const { defineConfig } = require('cypress')
-
 const fs = require('fs-extra');
+
+const FactorySeleniumEasy = require('./cypress/fixtures/SeleniumEasyFactory');
 let githubActionsKeys = {}
-
-async function setupNodeEvents(on, config) {  
-    
-    cleanReports();
-    readGitHubSecrets(config);
-  
-    on('task', {
-      logMsg(msg) {
-        console.log(msg);
-        return null;
-      },
-      getGithubKeys: () => {
-        return githubActionsKeys;
-      },
-    });
-
-    const envKey = config.env.envKey || 'default';
-    config.env.TEST_TRIGGER = 'local';
-
-    if (envKey !== 'default') {
-      return getConfigByFile(envKey, config);
-    } else {
-      return config;
-    }
-  }
   
 module.exports = defineConfig({
   e2e: {
@@ -58,6 +34,32 @@ module.exports = defineConfig({
   }
 })
 
+async function setupNodeEvents(on, config) {
+  //When running in GitHubActions config.env.TEST_TRIGGER will be 'workflow_dispatch' refer to (.github/workflows/qe.yml)
+  const testTrigger = config.env.TEST_TRIGGER || 'local'
+  const envKey = config.env.envKey || 'default';
+
+  if (envKey !== 'default') {
+    config = getConfigByFile(envKey, config);
+  }
+  
+  cleanReports();
+  readGitHubSecrets(config);
+  fixturesFactory(config);
+
+  on('task', {
+    logMsg(msg) {
+      console.log(msg);
+      return null;
+    },
+    getGithubKeys: () => {
+      return githubActionsKeys;
+    },
+  });
+
+  return config;
+}
+
 function cleanReports() {
     const reportPath = './cypress/results/reports';
     if (fs.existsSync(reportPath)) {
@@ -79,4 +81,9 @@ function getConfigByFile(envKey, config) {
 function readGitHubSecrets(config) {
     githubActionsKeys["process_env_CYPRESS_ACTION_TEST"] = process.env.CYPRESS_ACTION_TEST
     githubActionsKeys["config_ACTION_TEST"] = config.env.ACTION_TEST
+}
+
+function fixturesFactory(config) {
+  const cypressEnv = {...config.env}
+  FactorySeleniumEasy.fixtureFactory(cypressEnv)
 }
