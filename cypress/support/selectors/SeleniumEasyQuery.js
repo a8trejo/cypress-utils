@@ -18,6 +18,9 @@ class SeleniumEasyQuery {
             case 'hostingFalse': return cy.get("input[name='hosting'][value='no']")
             case 'projectInput': return cy.get("textarea[name='comment']")
             case 'sendButton': return cy.get(".form-group [type='submit']")
+            case 'firstDrag': return cy.get("#todrag [draggable]:nth-of-type(1)")
+            case 'dropBox': return cy.get("div#mydropzone")
+            case 'droppedElements': return cy.get("#droppedlist span")
         }
     }
 }

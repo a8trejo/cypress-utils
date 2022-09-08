@@ -11,6 +11,12 @@ class HeroAppQuery {
             case "inputForm": return cy.get(".example form")
             case "inputBox": return cy.get("#target")
             case "temporalMsg": return cy.get("p#result")
+            case "toggleButton": return cy.get("#checkbox + button")
+            case "loadingBar": return cy.get("#loading")
+            // Any timeout on a cy.get will be inherited by a 'should' when re-querying the DOM
+            case "toggleMsg": return cy.get("#message", { timeout: 15000 })
+            case "slideBar": return cy.get("input[type='range']")
+            case "slideValue": return cy.get("#range")
         }
     }
 }

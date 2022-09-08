@@ -27,4 +27,20 @@ describe("Selenium Easy Web Automation", () => {
             SeleniumEasyQuery.selectors('sendButton').click()
         })
     })
+
+    it("Drag and Drop Events", () => {
+        cy.visit("/drag-and-drop-demo.html")
+
+        // MUST access the `dataTransfer` property from the `drop` event which
+        // holds the files dropped into the browser window.
+        const dataTransfer = new DataTransfer();
+        
+        SeleniumEasyQuery.selectors('firstDrag').should("be.visible").then(($dragBox) => {
+            const boxText = $dragBox.text()
+            cy.wrap($dragBox).trigger('dragstart',{ dataTransfer });
+            SeleniumEasyQuery.selectors('dropBox').trigger('drop',{ dataTransfer });
+            SeleniumEasyQuery.selectors('droppedElements').should('contain', boxText)
+        })
+        
+    })
 })

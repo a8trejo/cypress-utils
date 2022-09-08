@@ -58,4 +58,20 @@ describe("Hero App Web Automation", () => {
         HeroAppQuery.selectors("inputBox").type("{enter}")
         HeroAppQuery.selectors("temporalMsg").should('contain', "You entered: ENTER")
     })
+
+    it("Re-querying the DOM for an element", () => {
+        cy.visit("/dynamic_controls")
+        HeroAppQuery.selectors("toggleButton").should('be.enabled').and('contain', "Remove")
+        .click()
+        HeroAppQuery.selectors("loadingBar").should('be.visible')
+        // 'should' assertion re-queries the DOM such as cy.get("#message", { timeout: 15000 }).should('be.visible')
+        HeroAppQuery.selectors("toggleMsg").should('be.visible')
+    })
+
+    it("Horizontal Slider Value Range", () => {
+        cy.visit("/horizontal_slider")
+
+        HeroAppQuery.selectors("slideBar").invoke('val', 3).trigger('change')
+        HeroAppQuery.selectors("slideBar").should('have.value', 3)
+    })
 })
