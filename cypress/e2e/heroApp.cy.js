@@ -72,7 +72,7 @@ describe("Hero App Web Automation", () => {
         cy.visit("/horizontal_slider")
 
         HeroAppQuery.selectors("slideBar").invoke('val', 3).trigger('change')
-        HeroAppQuery.selectors("slideBar").should('have.value', 3)
+        HeroAppQuery.selectors("slideValue").should('contain', 3)
     })
 
     it("Jquery UI & Download File", () => {
@@ -101,5 +101,21 @@ describe("Hero App Web Automation", () => {
         HeroAppQuery.selectors("iframeInput").should('contain', iframeText)
 
         // Used https://www.cypress.io/blog/2020/02/12/working-with-iframes-in-cypress/ as guide
+    })
+
+    it("Custom error msg on assertions", () => {
+        cy.visit("/horizontal_slider")
+        const succesMsg = "The Slider was moved succesfully!"
+
+        HeroAppQuery.selectors("slideBar").type("3")
+
+        // Binding to this event without rethrowing the error will prevent the test from failing
+        Cypress.on('fail', (error, runnable) => {
+        })
+            
+        HeroAppQuery.selectors("slideValue").should(($e) => {
+            const sliderValue = $e.text()
+            assert.isTrue(sliderValue==="3", succesMsg)
+        })
     })
 })
