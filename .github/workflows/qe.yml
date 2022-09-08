@@ -15,6 +15,16 @@ on:
         required: true
         default: 'no'
 
+      spec:
+        type: choice
+        description: Test File to run
+        required: true
+        default: all
+        options: 
+        - all
+        - heroApp.cy.js
+        - seleniumEasy.cy.js
+
 jobs:
   cypress-e2e:
     runs-on: ubuntu-latest
@@ -27,19 +37,23 @@ jobs:
       
       # Setting environment
       - name: Set Up Environment
+      # Both github.event.inputs.deployment and input.deployment should work
         run: |
           echo "TEST_ENVIRONMENT=${{ github.event.inputs.deployment == 'yes' && 'dev' || github.event.inputs.env}}" >> $GITHUB_ENV
+          echo "SPEC_CMD=${{ inputs.spec == 'all' && '' || --spec='cypress/e2e/inputs.spec'}}" >> $GITHUB_ENV
 
       # Run Test and Deploy
       - name: Quality Gates
         run: |
           echo Running in ${{ env.TEST_ENVIRONMENT }}
+          echo ${{env.SPEC_CMD}}
           echo Test, and deploy your project
 
       #NPM Installation and Cypress execution
       - name: Cypress Execution
         uses: cypress-io/github-action@v4
         with:
+          command: npx cypress run${{env.SPEC_CMD}}
           ci-build-id: '${{ github.job }}:${{ github.run_number }}-${{ github.run_attempt }}'
           tag: '${{ github.job }}:${{ github.run_number }}-${{ github.run_attempt }}'
           record: true
