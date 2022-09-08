@@ -40,7 +40,7 @@ jobs:
       # Both github.event.inputs.deployment and input.deployment should work
         run: |
           echo "TEST_ENVIRONMENT=${{ github.event.inputs.deployment == 'yes' && 'dev' || github.event.inputs.env}}" >> $GITHUB_ENV
-          echo "SPEC_PATTERN=${{ inputs.spec == 'all' && 'cypress/e2e/**/*.cy.js' || 'cypress/e2e/inputs.spec'}}" >> $GITHUB_ENV
+          echo "SPEC_PATTERN=${{ inputs.spec == 'all' && 'cypress/e2e/**/*.cy.js' || cypress/e2e/inputs.spec }}" >> $GITHUB_ENV
 
       # Run Test and Deploy
       - name: Quality Gates
