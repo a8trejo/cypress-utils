@@ -41,6 +41,5 @@ describe("Selenium Easy Web Automation", () => {
             SeleniumEasyQuery.selectors('dropBox').trigger('drop',{ dataTransfer });
             SeleniumEasyQuery.selectors('droppedElements').should('contain', boxText)
         })
-        
     })
 })

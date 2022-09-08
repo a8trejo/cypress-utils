@@ -20,7 +20,15 @@ class HeroAppQuery {
             case "enabledMenu": return cy.get("#ui-id-2>span")
             case "downloadsMenu": return cy.get("#ui-id-4>span")
             case "pdfDownload": return cy.get("#ui-id-6")
+            case "iframeInput": return HeroAppQuery.iframeBody()
+                
         }
+    }
+
+    static iframeBody () {
+        // Only the last command its('body') is retried
+        return cy.get("iframe#mce_0_ifr").its('0.contentDocument.body').should('not.be.empty')
+        .then(cy.wrap)
     }
 }
 

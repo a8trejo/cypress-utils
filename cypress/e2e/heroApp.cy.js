@@ -3,11 +3,11 @@ import HeroAppQuery from '../support/selectors/HeroAppQuery';
 
 before(() =>{
     Cypress.config('baseUrl', baseURL)
-    cy.visit("/")
 })
 
 describe("Hero App Web Automation", () => {
     it("Basic Auth promt", () => {
+        cy.visit("/")
         // Define and Encode the authentication string
         const authString = `${Cypress.env("username")}:${Cypress.env("password")}`;
         const encodedAuth = Buffer.from(authString).toString('base64')
@@ -85,5 +85,21 @@ describe("Hero App Web Automation", () => {
             HeroAppQuery.selectors("pdfDownload").invoke('removeAttr', 'href').click({force: true})
             cy.api({url: downloadUrl,})
         })
+    })
+
+
+    it("Single Iframe", () => {
+        cy.visit("/iframe")
+        const iframeText = "------------------YESSSSSSS------------------"
+
+        // Under the hood runs the following chain of commands with a cy.wrap at the end
+        // return cy.get("iframe#mce_0_ifr").its('0.contentDocument.body').should('not.be.empty').then(cy.wrap)
+        HeroAppQuery.selectors("iframeInput").should('be.visible').and('contain', "Your content goes here")
+            .clear().type(iframeText)
+        // This specific iframe allows directly typing into the body as it is a MCE WYSIWYG Editor
+
+        HeroAppQuery.selectors("iframeInput").should('contain', iframeText)
+
+        // Used https://www.cypress.io/blog/2020/02/12/working-with-iframes-in-cypress/ as guide
     })
 })
