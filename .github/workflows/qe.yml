@@ -28,8 +28,6 @@ on:
 jobs:
   cypress-e2e:
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Repo Checkout
@@ -46,10 +44,9 @@ jobs:
       - name: Quality Gates
         run: |
           echo Running in ${{ env.TEST_ENVIRONMENT }}
-          echo ${{env.SPEC_CMD}}
           echo Test, and deploy your project
 
-      #NPM Installation and Cypress execution
+      # NPM Installation and Cypress execution
       - name: Cypress Execution
         uses: cypress-io/github-action@v4
         with:
