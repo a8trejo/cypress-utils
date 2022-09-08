@@ -17,6 +17,9 @@ class HeroAppQuery {
             case "toggleMsg": return cy.get("#message", { timeout: 15000 })
             case "slideBar": return cy.get("input[type='range']")
             case "slideValue": return cy.get("#range")
+            case "enabledMenu": return cy.get("#ui-id-2>span")
+            case "downloadsMenu": return cy.get("#ui-id-4>span")
+            case "pdfDownload": return cy.get("#ui-id-6")
         }
     }
 }

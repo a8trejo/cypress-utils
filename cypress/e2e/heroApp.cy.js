@@ -74,4 +74,16 @@ describe("Hero App Web Automation", () => {
         HeroAppQuery.selectors("slideBar").invoke('val', 3).trigger('change')
         HeroAppQuery.selectors("slideBar").should('have.value', 3)
     })
+
+    it("Jquery UI & Download File", () => {
+        cy.visit("/jqueryui/menu")
+
+        HeroAppQuery.selectors("enabledMenu").click()
+        HeroAppQuery.selectors("downloadsMenu").click()
+
+        HeroAppQuery.selectors("pdfDownload").invoke('attr', 'href').then((downloadUrl) => {
+            HeroAppQuery.selectors("pdfDownload").invoke('removeAttr', 'href').click({force: true})
+            cy.api({url: downloadUrl,})
+        })
+    })
 })
