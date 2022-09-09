@@ -3,6 +3,7 @@
 class HeroAppQuery {
     static selectors (webElement) {
         switch (webElement) {
+            case "homeHeader": return cy.get("#content h1")
             case "Basic Auth": return cy.get("li>a").contains("Basic Auth")
             case "authorizedMsg": return cy.get(".example p")
             case "window1Text": return cy.get(".example h3")
@@ -21,7 +22,6 @@ class HeroAppQuery {
             case "downloadsMenu": return cy.get("#ui-id-4>span")
             case "pdfDownload": return cy.get("#ui-id-6")
             case "iframeInput": return HeroAppQuery.iframeBody()
-                
         }
     }
 

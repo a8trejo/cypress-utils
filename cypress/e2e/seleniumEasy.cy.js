@@ -3,9 +3,8 @@ const baseURL = Cypress.env("SeleniumEasy")
 const testFixtures = require('../fixtures/seleniumEasy.json')
 
 before(() =>{
-    Cypress.config('baseUrl', baseURL)
     // Login would usually happen here 
-    // cy.visit("/")
+    Cypress.config('baseUrl', baseURL)
 })
 
 describe("Selenium Easy Web Automation", { browser: "electron" }, () => {
@@ -41,5 +40,17 @@ describe("Selenium Easy Web Automation", { browser: "electron" }, () => {
             SeleniumEasyQuery.selectors('dropBox').trigger('drop',{ dataTransfer });
             SeleniumEasyQuery.selectors('droppedElements').should('contain', boxText)
         })
+    })
+
+    it("Multiple Origins", () => {
+        // With "experimentalSessionAndOrigin: true" after every test, the current page is reset to about:blank
+        const secondOrigin = Cypress.env("HeroApp")
+        cy.visit("/")
+        cy.origin(secondOrigin, () => {
+            cy.visit('/')
+            cy.get("#content h1").should('be.visible').and("contain", "Welcome")
+        })
+
+        // Selectors handling still far from ideal with cy.origin()
     })
 })

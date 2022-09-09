@@ -13,6 +13,7 @@ module.exports = defineConfig({
     defaultCommandTimeout: 10000,
     video: true,
     chromeWebSecurity: false,
+    experimentalSessionAndOrigin: true,
     screenshotsFolder: "cypress/results/screenshots",
     videosFolder: "cypress/results/videos",
     downloadsFolder: "cypress/results/downloads",
