@@ -24,12 +24,13 @@ module.exports = defineConfig({
     },
     env: {
         "TAGS": "not @skip",
-        "expandCollapseTime": 1500,
-        "ACTION_TEST": "[SHOULD BE OVERWRITTEN]",
         "SeleniumEasy": "https://demo.seleniumeasy.com/",
         "HeroApp": "https://the-internet.herokuapp.com/",
+        "expandCollapseTime": 1500,
+        "metaDataPath" : "cypress/results/reports/metadata/cypress-utils.json",
         "username": "[SHOULD BE OVERWRITTEN]",
-        "password": "[SHOULD BE OVERWRITTEN]"
+        "password": "[SHOULD BE OVERWRITTEN]",
+        "ACTION_TEST": "[SHOULD BE OVERWRITTEN]",
     },
     setupNodeEvents,
   }
@@ -43,6 +44,8 @@ async function setupNodeEvents(on, config) {
   if (envKey !== 'default') {
     config = getConfigByFile(envKey, config);
   }
+
+  require('cypress-grep/src/plugin')(config);
   
   cleanReports();
   readGitHubSecrets(config);
@@ -56,6 +59,12 @@ async function setupNodeEvents(on, config) {
     getGithubKeys: () => {
       return githubActionsKeys;
     },
+    readJsonMaybe(jsonPath) {
+      if (fs.existsSync(jsonPath)) {
+        return fs.readJson(jsonPath);
+      }
+      return {}
+    }
   });
 
   return config;

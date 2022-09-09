@@ -41,20 +41,20 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Repo Checkout
         uses: actions/checkout@v3
-      
+
+      - name: setup python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+
       # Setting environment
       - name: Set Up Environment
       # Both github.event.inputs.deployment and input.deployment should work
         run: |
           echo "TEST_ENVIRONMENT=${{ github.event.inputs.deployment == 'yes' && 'dev' || github.event.inputs.env}}" >> $GITHUB_ENV
           echo "SPEC_PATTERN=${{ inputs.spec == 'all' && '*.cy.js' || inputs.spec }}" >> $GITHUB_ENV
-
-      # Run Test and Deploy
-      - name: Quality Gates
-        run: |
-          echo Running in ${{ env.TEST_ENVIRONMENT }}
-          echo Test, and deploy your project
-
+          pip install requests
+      
       # NPM Installation and Cypress execution
       - name: Cypress Execution
         uses: cypress-io/github-action@v4
@@ -74,3 +74,11 @@ jobs:
           CYPRESS_username: ${{ secrets.CYPRESS_username }}
           CYPRESS_password: ${{ secrets.CYPRESS_password }}
           CYPRESS_envKey: ${{env.TEST_ENVIRONMENT}}
+      
+      - name: Jira Synch Script
+        run: |
+          python .github/scripts/cypress_jira_synch.py
+        env: 
+          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+          CYPRESS_DASHBOARD_ID: ${{ secrets.CYPRESS_DASHBOARD_ID }}

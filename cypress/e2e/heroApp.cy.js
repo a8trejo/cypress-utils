@@ -1,12 +1,30 @@
-const baseURL = Cypress.env("HeroApp")
 import HeroAppQuery from '../support/selectors/HeroAppQuery';
+
+const baseURL = Cypress.env("HeroApp")
+let testMeta = {}
+const jiraProject = 'QE'
 
 before(() =>{
     Cypress.config('baseUrl', baseURL)
 })
 
+beforeEach(function () {
+    testMeta = {}
+    testMeta.jiraProjectKey = jiraProject
+
+});
+
+afterEach( function() {
+    testMeta.state = this.currentTest.state
+    testMeta.tags = this.currentTest._testConfig.unverifiedTestConfig.tags
+    cy.printTestMeta(testMeta, Cypress.currentTest)
+});
+
 describe("Hero App Web Automation", () => {
-    it("Basic Auth promt", () => {
+    it("Basic Auth promt", { tags: ['@smoke'] }, () => {
+        testMeta.testSummary = "Testing a basic authorization prompt by intercepting the /basic_auth endpoint and providing an auth header to it"
+        testMeta.testedIds = ['QE-1']
+        // testMeta.testCaseId = 'QE-1233'
         cy.visit("/")
         // Define and Encode the authentication string
         const authString = `${Cypress.env("username")}:${Cypress.env("password")}`;
@@ -75,7 +93,7 @@ describe("Hero App Web Automation", () => {
         HeroAppQuery.selectors("slideValue").should('contain', 3)
     })
 
-    it("Jquery UI & Download File", () => {
+    it("Jquery UI and Download File", () => {
         cy.visit("/jqueryui/menu")
 
         HeroAppQuery.selectors("enabledMenu").click()

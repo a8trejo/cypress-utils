@@ -6,3 +6,6 @@ cypress/config/cucumber_json
 
 # Factory Fixtures
 seleniumEasy.json
+
+# Debugging files
+cypress/fixtures/debug

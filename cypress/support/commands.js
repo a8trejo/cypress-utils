@@ -36,3 +36,37 @@ Cypress.Commands.add('getTimeStamp', timeFormat => {
         resolve(timeStamp);
     });
 });
+
+Cypress.Commands.add('printTestMeta', (testMeta, testObject) => {
+    const metaFile = Cypress.env("metaDataPath")
+    const metaData = {...testObject, ...testMeta}
+    let testInfoArray = []
+    let retriedTest = false
+  
+    cy.task('readJsonMaybe', metaFile).then((fileObj) => {
+      
+      // If the metadata report does not exists
+      if (typeof fileObj.testInfo === 'undefined') {
+        // testInfo argument will be an array containing all of the tests info as a json object
+        fileObj.testInfo = []
+      }
+  
+      // Empty array OR all the info of the metadata report
+      testInfoArray = [...fileObj.testInfo]
+      
+      testInfoArray.forEach((test, index) => {
+        if (test.title === metaData.title) {
+          retriedTest = true
+          metaData.retried = retriedTest
+          testInfoArray[index] = metaData
+        }
+      })
+      if (retriedTest === false){
+        testInfoArray.push(metaData)
+      }
+  
+      // Updating the file object
+      fileObj.testInfo = testInfoArray
+      cy.writeFile(metaFile, fileObj)
+    })
+  });

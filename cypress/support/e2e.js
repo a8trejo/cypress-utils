@@ -19,7 +19,7 @@ import '@bahmutov/cy-api'
 
 // Alternatively you can use CommonJS syntax:
 // require('./commands')
-
+require('cypress-grep')();
 
 Cypress.on('uncaught:exception', (err, runnable) => {
     return false
