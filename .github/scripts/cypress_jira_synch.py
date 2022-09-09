@@ -48,7 +48,8 @@ def jira_jql_search(jql_query):
     jira_jql_response = requests.request(
         "GET", jira_jql_endpoint, headers={ "Authorization": "Basic " + JIRA_API_TOKEN}
     )
-    print(jira_jql_response.json())
+    print("Status Code: " + str(jira_jql_response.status_code))
+    print(jira_jql_response.text)
     return jira_jql_response.json().get("issues")
 
 # Returns the new test id
