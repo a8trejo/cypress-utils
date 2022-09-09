@@ -43,13 +43,12 @@ print("-------------------------------------------------------------------------
 # Searchs for the jira issue with a JQL Query
 def jira_jql_search(jql_query):
     print(f"JQL searching for test: {jql_query}")
-    jira_jql_endpoint = (
-        JIRA_BASE_URL + "/search?jql=" + jql_query + "&fields=summary, labels, parent"
-    )
+    jira_jql_endpoint = JIRA_BASE_URL + "/search?jql=" + jql_query + "&fields=summary, labels, parent"
+    print(jira_jql_endpoint)
     jira_jql_response = requests.request(
-        "GET", jira_jql_endpoint, headers={"Authorization": "Basic " + JIRA_API_TOKEN}
+        "GET", jira_jql_endpoint, headers={ "Authorization": "Basic " + JIRA_API_TOKEN}
     )
-    print(jira_jql_response.json().get("issues"))
+    print(jira_jql_response.json())
     return jira_jql_response.json().get("issues")
 
 # Returns the new test id
