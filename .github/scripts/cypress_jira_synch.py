@@ -223,6 +223,8 @@ def format_labels_paylod(test_case_current_labels, test_case_new_labels):
 # ------------------------------------------------------------------------------------------
 # Main
 # ------------------------------------------------------------------------------------------
+results_reports = "File Found" if "testInfo" in EXECUTION_DATA else "404 File Not Foound"
+print(results_reports)
 for index, test_case in enumerate(EXECUTION_DATA["testInfo"]):
     test_name = test_case["title"]
     test_status = test_case["state"]
