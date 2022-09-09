@@ -8,7 +8,7 @@ before(() =>{
     // cy.visit("/")
 })
 
-describe("Selenium Easy Web Automation", () => {
+describe("Selenium Easy Web Automation", { browser: "electron" }, () => {
 
     testFixtures["Form Data"].forEach((plot) => {
         it(`Dynamic Test Case Input Form: ${plot.title}`, () => {
