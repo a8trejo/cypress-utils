@@ -24,6 +24,15 @@ on:
         - all
         - heroApp.cy.js
         - seleniumEasy.cy.js
+      
+      browser:
+        type: choice
+        description: Browser to use on the tests
+        required: true
+        default: electron
+        options: 
+        - chrome
+        - electron
 
 jobs:
   cypress-e2e:
@@ -54,7 +63,7 @@ jobs:
           ci-build-id: '${{ github.job }}:${{ github.run_number }}-${{ github.run_attempt }}'
           tag: '${{ github.job }}:${{ github.run_number }}-${{ github.run_attempt }}'
           record: true
-          browser: chrome
+          browser: ${{ inputs.browser }}
           headed: false
           install: true
         env:
