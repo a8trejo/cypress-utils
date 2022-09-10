@@ -296,3 +296,7 @@ for index, test_case in enumerate(EXECUTION_DATA["testInfo"]):
             )
             print("Status Code: " + str(jira_edit_reponse.status_code))
             print(jira_edit_reponse.text)
+
+print("----------------------------------------------------------------------------------")
+print("Cypress - Jira Synch Complete")
+print("----------------------------------------------------------------------------------")
