@@ -58,6 +58,7 @@ jobs:
       # NPM Installation and Cypress execution
       - name: Cypress Execution
         uses: cypress-io/github-action@v4
+        continue-on-error: true
         with:
           spec: '**/${{env.SPEC_PATTERN}}'
           ci-build-id: '${{ github.job }}:${{ github.run_number }}-${{ github.run_attempt }}'
@@ -76,7 +77,6 @@ jobs:
           CYPRESS_envKey: ${{env.TEST_ENVIRONMENT}}
       
       - name: Jira Synch Script
-        continue-on-error: true
         run: |
           python .github/scripts/cypress_jira_synch.py
         env: 
