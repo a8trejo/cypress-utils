@@ -76,6 +76,7 @@ jobs:
           CYPRESS_envKey: ${{env.TEST_ENVIRONMENT}}
       
       - name: Jira Synch Script
+        continue-on-error: true
         run: |
           python .github/scripts/cypress_jira_synch.py
         env: 
