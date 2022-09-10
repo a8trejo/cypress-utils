@@ -243,7 +243,7 @@ for index, test_case in enumerate(EXECUTION_DATA["testInfo"]):
     test_case_new_labels = test_case["tags"] if "tags" in test_case else []
     if len(jql_array) == 0:
         # Include test status label in jira Story?
-        test_create_labels = ["test_case", "automated"] + test_case_new_labels
+        test_create_labels = ["cypress", "automated"] + test_case_new_labels
 
         new_test_id = jira_create_transition_test(
             test_name, test_create_labels, test_status, test_description

@@ -1,16 +1,41 @@
 import SeleniumEasyQuery from '../support/selectors/SeleniumEasyQuery';
+
 const baseURL = Cypress.env("SeleniumEasy")
 const testFixtures = require('../fixtures/seleniumEasy.json')
+const jiraProject = Cypress.env("jiraProjectKey")
+let testMeta = {}
 
 before(() =>{
     // Login would usually happen here 
     Cypress.config('baseUrl', baseURL)
 })
 
+beforeEach(function () {
+    //Resetting the previous test metadata for the new test
+    testMeta = {}
+    testMeta.jiraProjectKey = jiraProject
+});
+
+// Not using arrow function to keep the inheritange of "this" as the test object
+afterEach(function() {
+    testMeta.state = this.currentTest.state
+    const mochaTestTags = this.currentTest._testConfig.unverifiedTestConfig.tags
+
+    if("tags" in testMeta && typeof(mochaTestTags) !== 'undefined') {
+        testMeta.tags = [...testMeta.tags, ...mochaTestTags]
+    } else if (!("tags" in testMeta) && typeof(mochaTestTags) !== 'undefined') {
+        testMeta.tags = mochaTestTags
+    }
+    cy.printTestMeta(testMeta, Cypress.currentTest)
+});
+
 describe("Selenium Easy Web Automation", { browser: "electron" }, () => {
 
     testFixtures["Form Data"].forEach((plot) => {
         it(`Dynamic Test Case Input Form: ${plot.title}`, () => {
+            if("tags" in plot) {
+                testMeta.tags = plot.tags
+            }
             cy.visit('/input-form-demo.html')
             SeleniumEasyQuery.selectors('firstNameInput').should('be.visible').and('be.enabled')
             .type(plot.arguments.firstName)

@@ -27,6 +27,7 @@ module.exports = defineConfig({
         "SeleniumEasy": "https://demo.seleniumeasy.com/",
         "HeroApp": "https://the-internet.herokuapp.com/",
         "expandCollapseTime": 1500,
+        "jiraProjectKey": "QE",
         "metaDataPath" : "cypress/results/reports/metadata/cypress-utils.json",
         "username": "[SHOULD BE OVERWRITTEN]",
         "password": "[SHOULD BE OVERWRITTEN]",

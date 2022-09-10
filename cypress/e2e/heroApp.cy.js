@@ -1,8 +1,8 @@
 import HeroAppQuery from '../support/selectors/HeroAppQuery';
 
 const baseURL = Cypress.env("HeroApp")
+const jiraProject = Cypress.env("jiraProjectKey")
 let testMeta = {}
-const jiraProject = 'QE'
 
 before(() =>{
     Cypress.config('baseUrl', baseURL)
@@ -24,7 +24,9 @@ describe("Hero App Web Automation", () => {
     it("Basic Auth promt", { tags: ['@smoke'] }, () => {
         testMeta.testSummary = "Testing a basic authorization prompt by intercepting the /basic_auth endpoint and providing an auth header to it"
         testMeta.testedIds = ['QE-1']
-        // testMeta.testCaseId = 'QE-1233'
+        // If the test ID does not exists, python script will create it in Jira
+        // testMeta.testCaseId = 'QE-1233' 
+
         cy.visit("/")
         // Define and Encode the authentication string
         const authString = `${Cypress.env("username")}:${Cypress.env("password")}`;
