@@ -14,7 +14,7 @@ class SeleniumEasyFactory {
 
         const happyPath = {
             "title": "aegon-the-conquerer",
-            "tags": "@regression",
+            "tags": ["@regression"],
             "arguments": {
                 "firstName": "Aegon",
                 "lastName": "Targaryen",
@@ -28,7 +28,7 @@ class SeleniumEasyFactory {
 
         const roguePrince = {...happyPath, ...{
             "title": "rogue-prince",
-            "tags": "@smoke",
+            "tags": ["@smoke"],
             "arguments": {...happyPath.arguments,
                 "firstName": "Daemon",
                 "email": "daemon@ironthrone.com",
@@ -38,7 +38,7 @@ class SeleniumEasyFactory {
 
         const trueHeir = {...roguePrince, ...{
             "title": "true-heir",
-            "tags": "@smoke",
+            "tags": ["@smoke"],
             "arguments": {...roguePrince.arguments,
                 "firstName": "Rhaenyra",
                 "email": "rhaenyra@ironthrone.com",
