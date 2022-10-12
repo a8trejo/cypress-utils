@@ -78,4 +78,11 @@ describe("Selenium Easy Web Automation", { browser: "electron" }, () => {
 
         // Selectors handling still far from ideal with cy.origin()
     })
+
+    it("Connect to MySQL DB and execute query", () => {
+        const sqlQuery = "SELECT * FROM wp_posts WHERE post_type='product' LIMIT 3;"
+        cy.task('dbExec', {dbName: "wordpress-db", sql: sqlQuery}).then((sqlRows) => {
+            cy.objectToDOM(sqlRows)
+        })
+    })
 })

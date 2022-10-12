@@ -23,6 +23,8 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
+import { prettyPrintJson } from 'pretty-print-json';
+
 
 Cypress.Commands.add('logMsg', (logMsg) => {
     cy.task('logMsg', logMsg)
@@ -70,3 +72,16 @@ Cypress.Commands.add('printTestMeta', (testMeta, testObject) => {
       cy.writeFile(metaFile, fileObj)
     })
   });
+
+Cypress.Commands.add('objectToDOM', (object) => { 
+    let newElement = window.document.createElement('p')
+    // newElement.innerText = (JSON.stringify(object, null, "\t"))
+    
+    const printOptions = {indent: 5, lineNumbers: true, quoteKeys: true}
+    newElement.innerHTML = prettyPrintJson.toHtml(object, printOptions)
+    newElement.style.fontSize = "small";
+    newElement.style.fontWeight = '650'
+    cy.get('body').then((testRunner) => {
+        testRunner.get(0).prepend(newElement)
+    })
+})

@@ -86,7 +86,7 @@ def jira_create_transition_test(issue_name, issue_labels, test_status, issue_des
     print("------------------------------------------------------------------------------")
     print("Transitioning Jira Test Case " + new_test_id + " into Done status....")
     print("------------------------------------------------------------------------------")
-    
+    # The comment is NOT getting added
     transition_test_endpoint = JIRA_BASE_URL + "/issue/" + new_test_id + "/transitions"
     transition_payload = json.dumps(
         {

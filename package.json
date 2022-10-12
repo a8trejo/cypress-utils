@@ -13,7 +13,9 @@
     "dayjs": "^1.10.6",
     "mocha": "^9.1.3",
     "mochawesome": "^7.0.1",
-    "mochawesome-merge": "^4.2.0"
+    "mochawesome-merge": "^4.2.0",
+    "mysql": "github:mysqljs/mysql",
+    "pretty-print-json": "^1.3.0"
   },
   "scripts": {
     "mocha-merge": "mochawesome-merge ./cypress/results/reports/mochawesome_reports/*.json -o cypress/results/reports/mochawesome_complete/complete-report.json",

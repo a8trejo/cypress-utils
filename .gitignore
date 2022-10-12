@@ -1,8 +1,13 @@
+# Node
 node_modules
 
-cypress.env.json
+# Cypress results
 cypress/results
 cypress/config/cucumber_json
+cypress.env.json
+
+# Secrets
+secrets.env.sh
 
 # Factory Fixtures
 seleniumEasy.json

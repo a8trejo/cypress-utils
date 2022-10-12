@@ -1,5 +1,6 @@
 const { defineConfig } = require('cypress')
 const fs = require('fs-extra');
+const mysql = require('mysql')
 
 const FactorySeleniumEasy = require('./cypress/fixtures/SeleniumEasyFactory');
 let githubActionsKeys = {}
@@ -29,6 +30,21 @@ module.exports = defineConfig({
         "expandCollapseTime": 1500,
         "jiraProjectKey": "QE",
         "metaDataPath" : "cypress/results/reports/metadata/cypress-utils.json",
+        "DB_CONFIG": {
+          "wordpress-db": {
+            "db_name": "wordpress-db",
+            "base_url": {
+                "local": "localhost",
+                "dev": "http://cool-site-db:dev",
+                "test": "http://cool-site-db:test"
+            },
+            "port": {
+                "local": 3306,
+                "dev": 3306,
+                "test": 3306
+            }
+          }
+      },
         "username": "[SHOULD BE OVERWRITTEN]",
         "password": "[SHOULD BE OVERWRITTEN]",
         "ACTION_TEST": "[SHOULD BE OVERWRITTEN]",
@@ -39,10 +55,11 @@ module.exports = defineConfig({
 
 async function setupNodeEvents(on, config) {
   //When running in GitHubActions config.env.TEST_TRIGGER will be 'workflow_dispatch' refer to (.github/workflows/qe.yml)
-  const testTrigger = config.env.TEST_TRIGGER || 'local'
-  const envKey = config.env.envKey || 'default';
+  const testTrigger = config.env.TEST_TRIGGER || 'default'
+  const envKey = config.env.envKey || 'local';
+  config.env['envKey'] = envKey
 
-  if (envKey !== 'default') {
+  if (envKey !== 'local') {
     config = getConfigByFile(envKey, config);
   }
 
@@ -65,6 +82,9 @@ async function setupNodeEvents(on, config) {
         return fs.readJson(jsonPath);
       }
       return {}
+    },
+    dbExec({dbName, sql}) {
+      return dbQuery(dbName, sql, config)
     }
   });
 
@@ -97,4 +117,32 @@ function readGitHubSecrets(config) {
 function fixturesFactory(config) {
   const cypressEnv = {...config.env}
   FactorySeleniumEasy.fixtureFactory(cypressEnv)
+}
+
+// sql, dbName, config
+function dbQuery(dbName, query, config) {
+  const envKey = config.env.envKey
+  
+  // Config options in https://github.com/mysqljs/mysql
+  const dbConfig = {
+    "host": config.env.DB_CONFIG[dbName].base_url[envKey],
+    "port": config.env.DB_CONFIG[dbName].port[envKey],
+    "user": config.env.DB_USER,
+    "password": config.env.DB_PASSWORD,
+    "database": dbName
+  }
+  const dbConnection = mysql.createConnection(dbConfig)
+  dbConnection.connect()
+
+  // exec query + disconnect to db as a Promise
+  return new Promise((resolve, reject) => {
+    dbConnection.query(query, (error, dbResults) => {
+      if (error) reject(error)
+      else {
+        dbConnection.end()
+        // console.log(dbResults)
+        return resolve(dbResults)
+      }
+    })
+  })
 }
