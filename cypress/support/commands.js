@@ -74,13 +74,15 @@ Cypress.Commands.add('printTestMeta', (testMeta, testObject) => {
   });
 
 Cypress.Commands.add('objectToDOM', (object) => { 
-    let newElement = window.document.createElement('p')
-    // newElement.innerText = (JSON.stringify(object, null, "\t"))
-    
-    const printOptions = {indent: 5, lineNumbers: true, quoteKeys: true}
-    newElement.innerHTML = prettyPrintJson.toHtml(object, printOptions)
-    newElement.style.fontSize = "small";
+    let newElement = window.document.createElement('pre')
+    newElement.style.fontSize = "medium";
     newElement.style.fontWeight = '650'
+    newElement.style.overflow = 'auto'
+
+    //newElement.innerText = JSON.stringify(object, null, 2)
+    const printOptions = {indent: 2, lineNumbers: false, quoteKeys: true}
+    newElement.innerHTML = prettyPrintJson.toHtml(object, printOptions)
+    
     cy.get('body').then((testRunner) => {
         testRunner.get(0).prepend(newElement)
     })

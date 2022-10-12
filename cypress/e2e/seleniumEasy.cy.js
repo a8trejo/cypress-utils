@@ -80,7 +80,7 @@ describe("Selenium Easy Web Automation", { browser: "electron" }, () => {
     })
 
     it("Connect to MySQL DB and execute query", () => {
-        const sqlQuery = "SELECT * FROM wp_posts WHERE post_type='product' LIMIT 3;"
+        const sqlQuery = "SELECT * FROM wp_posts WHERE post_type='product';"
         cy.task('dbExec', {dbName: "wordpress-db", sql: sqlQuery}).then((sqlRows) => {
             cy.objectToDOM(sqlRows)
         })
