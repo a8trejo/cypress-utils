@@ -85,4 +85,15 @@ describe("Selenium Easy Web Automation", { browser: "electron" }, () => {
             cy.objectToDOM(sqlRows)
         })
     })
+
+    it("Typing backspaces", () => {
+        const MSG_CONTENT = 'Hi! This is a a demo test!!!';
+        
+        cy.visit('/basic-first-form-demo.html')
+
+        SeleniumEasyQuery.selectors('inputForm').clear().type(MSG_CONTENT)
+        const backspaces = "{backspace}".repeat(MSG_CONTENT.length)
+        SeleniumEasyQuery.selectors('inputForm').type(backspaces)
+        SeleniumEasyQuery.selectors('inputForm').should('be.empty')
+    })
 })

@@ -21,6 +21,7 @@ class SeleniumEasyQuery {
             case 'firstDrag': return cy.get("#todrag [draggable]:nth-of-type(1)")
             case 'dropBox': return cy.get("div#mydropzone")
             case 'droppedElements': return cy.get("#droppedlist span")
+            case 'inputForm': return cy.get("input#user-message")
         }
     }
 }
