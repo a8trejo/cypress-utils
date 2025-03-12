@@ -8,6 +8,7 @@ cypress.env.json
 
 # Secrets
 secrets.env.sh
+secrets.json
 
 # Factory Fixtures
 seleniumEasy.json

@@ -24,6 +24,7 @@
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 import { prettyPrintJson } from 'pretty-print-json';
+import { ApiLogLvl } from '../support/e2e'
 
 
 Cypress.Commands.add('logMsg', (logMsg) => {
@@ -86,4 +87,36 @@ Cypress.Commands.add('objectToDOM', (object) => {
     cy.get('body').then((testRunner) => {
         testRunner.get(0).prepend(newElement)
     })
+})
+
+/**
+ * API call to Github
+ *
+ * @param options
+ * @param apiDOM - if true, the call is made with cy.api, if false, with cy.request
+ */
+Cypress.Commands.add('apiGithub', (options, apiDOM = ApiLogLvl.REQUEST) => {
+  const apiOptions = {
+      ...options,
+      ...{
+          url: Cypress.env('githubApi') + options.url,
+          headers: {
+              'Accept': "application/vnd.github+json",
+              'X-GitHub-Api-Version': "2022-11-28",
+              "Authorization": `Bearer ${Cypress.env('GITHUB_TOKEN')}`,
+              ...options.headers,
+          },
+          failOnStatusCode: false,
+      },
+  }
+
+  if (apiDOM) {
+      cy.api(apiOptions).then(response => {
+          return response
+      })
+  } else {
+      cy.request(apiOptions).then(response => {
+          return response
+      })
+  }
 })

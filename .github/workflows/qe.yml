@@ -38,9 +38,8 @@ jobs:
   cypress-e2e:
     runs-on: ubuntu-latest
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Repo Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: setup python
         uses: actions/setup-python@v4
@@ -51,9 +50,8 @@ jobs:
       - name: Set Up Environment
       # Both github.event.inputs.deployment and input.deployment should work
         run: |
-          echo "TEST_ENVIRONMENT=${{ github.event.inputs.deployment == 'yes' && 'dev' || github.event.inputs.env}}" >> $GITHUB_ENV
+          echo "TEST_ENVIRONMENT=${{ inputs.deployment == 'yes' && 'dev' || inputs.env}}" >> $GITHUB_ENV
           echo "SPEC_PATTERN=${{ inputs.spec == 'all' && '*.cy.js' || inputs.spec }}" >> $GITHUB_ENV
-          pip install requests
       
       # NPM Installation and Cypress execution
       - name: Cypress Execution
@@ -62,13 +60,13 @@ jobs:
         with:
           spec: '**/${{env.SPEC_PATTERN}}'
           ci-build-id: '${{ github.job }}:${{ github.run_number }}-${{ github.run_attempt }}'
-          tag: '${{ github.job }}:${{ github.run_number }}-${{ github.run_attempt }}'
+          tag: 'cy'
           record: true
           browser: ${{ inputs.browser }}
           headed: false
           install: true
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CYPRESS_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CYPRESS_PROJECT_ID: ${{ secrets.CYPRESS_DASHBOARD_ID }}
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_DASHBOARD_KEY }}
           CYPRESS_TEST_TRIGGER: ${{github.event_name}}
@@ -76,7 +74,9 @@ jobs:
           CYPRESS_password: ${{ secrets.CYPRESS_password }}
           CYPRESS_envKey: ${{env.TEST_ENVIRONMENT}}
       
+      # Moving away from this but keeping as reference
       - name: Jira Synch Script
+        if: false
         run: |
           python .github/scripts/cypress_jira_synch.py
         env: 

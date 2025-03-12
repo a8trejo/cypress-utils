@@ -21,6 +21,16 @@ import 'cypress-plugin-api'
 // require('./commands')
 require('@cypress/grep')()
 
+// /**
+//  * Self-descriptive options for API logging levels.
+//  * DOM: Whether API interactions are shown in the DOM and cypress command log.
+//  * REQUEST: Whether API interactions are shown only on the cypress command log.
+//  */
+export const ApiLogLvl = {
+    DOM: true,
+    REQUEST: false,
+}
+
 Cypress.on('uncaught:exception', (err, runnable) => {
     return false
 })

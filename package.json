@@ -6,16 +6,16 @@
   "author": "Abel Trejo Pineda",
   "license": "ISC",
   "devDependencies": {
-    "@bahmutov/cy-api": "^2.2.0",
-    "cypress": "^14.1.0",
     "@cypress/grep": "^3.1.5",
+    "@cypress/puppeteer": "^0.1.5",
     "cypress-multi-reporters": "^1.6.1",
+    "cypress-real-events": "^1.14.0",
     "dayjs": "^1.10.6",
     "mocha": "^9.1.3",
     "mochawesome": "^7.0.1",
     "mochawesome-merge": "^4.2.0",
-    "mysql": "github:mysqljs/mysql",
-    "pretty-print-json": "^1.3.0"
+    "pretty-print-json": "^1.3.0",
+    "typescript": "^5.8.2"
   },
   "scripts": {
     "yalc:build": "npm run build && yalc publish",
@@ -24,6 +24,8 @@
     "awesome-report": "npm run mocha-merge && npm run mocha-marge"
   },
   "dependencies": {
-    "cypress-plugin-api": "^2.11.2"
+    "cypress": "^14.1.0",
+    "cypress-plugin-api": "^2.11.2",
+    "mysql": "github:mysqljs/mysql"
   }
 }
