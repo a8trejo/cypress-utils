@@ -1,6 +1,8 @@
 {
     "baseUrl": "https://the-internet.herokuapp.com/",
     "env":{
-        "TAGS": "not @admin"
+        "TAGS": "not @admin",
+        "username": "admin",
+        "password": "admin"
     }
 }

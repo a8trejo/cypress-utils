@@ -7,6 +7,7 @@ let githubActionsKeys = {}
   
 module.exports = defineConfig({
   e2e: {
+    morgan: false,
     watchForFileChanges: false,
     specPattern: ["cypress/e2e/**/*.cy.{js,jsx,ts,tsx}"],
     pageLoadTimeout: 90000,
@@ -25,6 +26,7 @@ module.exports = defineConfig({
     },
     env: {
         "TAGS": "not @skip",
+        "hideCredentials": "true",
         "SeleniumEasy": "https://demo.seleniumeasy.com/",
         "HeroApp": "https://the-internet.herokuapp.com/",
         "expandCollapseTime": 1500,
@@ -45,8 +47,8 @@ module.exports = defineConfig({
             }
           }
       },
-        "username": "[SHOULD BE OVERWRITTEN]",
-        "password": "[SHOULD BE OVERWRITTEN]",
+        "username": "admin",
+        "password": "admin",
         "ACTION_TEST": "[SHOULD BE OVERWRITTEN]",
     },
     setupNodeEvents,
@@ -63,7 +65,7 @@ async function setupNodeEvents(on, config) {
     config = getConfigByFile(envKey, config);
   }
 
-  require('cypress-grep/src/plugin')(config);
+  require('@cypress/grep/src/plugin')(config);
   
   cleanReports();
   readGitHubSecrets(config);

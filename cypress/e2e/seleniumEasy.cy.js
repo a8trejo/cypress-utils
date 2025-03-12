@@ -5,6 +5,8 @@ const testFixtures = require('../fixtures/seleniumEasy.json')
 const jiraProject = Cypress.env("jiraProjectKey")
 let testMeta = {}
 
+const seleniumEasyPage = new SeleniumEasyQuery()
+
 before(() =>{
     // Login would usually happen here 
     Cypress.config('baseUrl', baseURL)
@@ -37,18 +39,23 @@ describe("Selenium Easy Web Automation", { browser: "electron" }, () => {
                 testMeta.tags = plot.tags
             }
             cy.visit('/input-form-demo.html')
-            SeleniumEasyQuery.selectors('firstNameInput').should('be.visible').and('be.enabled')
+            seleniumEasyPage.firstNameInput().should('be.visible').and('be.enabled')
             .type(plot.arguments.firstName)
-            SeleniumEasyQuery.selectors('lastNameInput').type(plot.arguments.lastName)
-            SeleniumEasyQuery.selectors('emailInput').type(plot.arguments.email)
-            SeleniumEasyQuery.selectors('cityInput').type(plot.arguments.city)
-            SeleniumEasyQuery.selectors('stateInput').select(plot.arguments.state)
+            seleniumEasyPage.lastNameInput().type(plot.arguments.lastName)
+            seleniumEasyPage.emailInput().type(plot.arguments.email)
+            seleniumEasyPage.cityInput().type(plot.arguments.city)
+            seleniumEasyPage.stateInput().select(plot.arguments.state)
 
             const hostingBoolean = (plot.arguments.hosting) ? "hostingTrue":"hostingFalse"
-            SeleniumEasyQuery.selectors(hostingBoolean).click()
+            if (hostingBoolean) {
+                seleniumEasyPage.hostingTrue().click()
+            } else {
+                seleniumEasyPage.hostingFalse().click()
 
-            SeleniumEasyQuery.selectors('projectInput').type(plot.arguments.projectDescription)
-            SeleniumEasyQuery.selectors('sendButton').click()
+            }
+
+            seleniumEasyPage.projectInput().type(plot.arguments.projectDescription)
+            seleniumEasyPage.sendButton().click()
         })
     })
 
@@ -59,11 +66,11 @@ describe("Selenium Easy Web Automation", { browser: "electron" }, () => {
         // holds the files dropped into the browser window.
         const dataTransfer = new DataTransfer();
         
-        SeleniumEasyQuery.selectors('firstDrag').should("be.visible").then(($dragBox) => {
+        seleniumEasyPage.firstDrag().should("be.visible").then(($dragBox) => {
             const boxText = $dragBox.text()
             cy.wrap($dragBox).trigger('dragstart',{ dataTransfer });
-            SeleniumEasyQuery.selectors('dropBox').trigger('drop',{ dataTransfer });
-            SeleniumEasyQuery.selectors('droppedElements').should('contain', boxText)
+            seleniumEasyPage.dropBox().trigger('drop',{ dataTransfer });
+            seleniumEasyPage.droppedElements().should('contain', boxText)
         })
     })
 
@@ -91,9 +98,9 @@ describe("Selenium Easy Web Automation", { browser: "electron" }, () => {
         
         cy.visit('/basic-first-form-demo.html')
 
-        SeleniumEasyQuery.selectors('inputForm').clear().type(MSG_CONTENT)
+        seleniumEasyPage.inputForm().clear().type(MSG_CONTENT)
         const backspaces = "{backspace}".repeat(MSG_CONTENT.length)
-        SeleniumEasyQuery.selectors('inputForm').type(backspaces)
-        SeleniumEasyQuery.selectors('inputForm').should('be.empty')
+        seleniumEasyPage.inputForm().type(backspaces)
+        seleniumEasyPage.inputForm().should('be.empty')
     })
 })

@@ -7,8 +7,8 @@
   "license": "ISC",
   "devDependencies": {
     "@bahmutov/cy-api": "^2.2.0",
-    "cypress": "^13.6.6",
-    "cypress-grep": "^3.0.3",
+    "cypress": "^14.1.0",
+    "@cypress/grep": "^3.1.5",
     "cypress-multi-reporters": "^1.6.1",
     "dayjs": "^1.10.6",
     "mocha": "^9.1.3",
@@ -18,8 +18,12 @@
     "pretty-print-json": "^1.3.0"
   },
   "scripts": {
+    "yalc:build": "npm run build && yalc publish",
     "mocha-merge": "mochawesome-merge ./cypress/results/reports/mochawesome_reports/*.json -o cypress/results/reports/mochawesome_complete/complete-report.json",
     "mocha-marge": "marge cypress/results/reports/mochawesome_complete/complete-report.json -f complete-report -o cypress/results/reports/mochawesome_complete",
     "awesome-report": "npm run mocha-merge && npm run mocha-marge"
+  },
+  "dependencies": {
+    "cypress-plugin-api": "^2.11.2"
   }
 }
