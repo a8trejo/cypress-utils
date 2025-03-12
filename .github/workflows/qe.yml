@@ -1,4 +1,5 @@
-name: QE Pipeline
+name: Cypress Automation
+run-name: Cypress Automation ${{ github.sha }}
 
 on:
   # Allows you to run this workflow manually from the Actions tab
@@ -29,7 +30,7 @@ on:
         type: choice
         description: Browser to use on the tests
         required: true
-        default: electron
+        default: chrome
         options: 
         - chrome
         - electron
