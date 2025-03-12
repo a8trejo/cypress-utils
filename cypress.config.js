@@ -135,7 +135,8 @@ function getSecretsByKey(envKey, config) {
     })
     return config
   } else {
-    throw new Error('Credentials are Empty! Secrets not found, please run the aws-secrets.sh script')
+    // throw new Error('Credentials are Empty! Secrets not found, please run the aws-secrets.sh script')
+    console.log('Credentials are Empty! Secrets not found, make sure they are in process.env')
   }
 }
 
