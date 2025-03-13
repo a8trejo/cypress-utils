@@ -15,3 +15,7 @@ seleniumEasy.json
 
 # Debugging files
 cypress/fixtures/debug
+
+# Yalc
+.yalc
+yalc.lock
