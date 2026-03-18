@@ -1,6 +1,6 @@
 const { defineConfig } = require('cypress')
 const fs = require('fs-extra')
-const setup = require('@cypress/puppeteer').setup
+import { setup } from '@cypress/puppeteer'
 
 const FactorySeleniumEasy = require('./cypress/fixtures/SeleniumEasyFactory')
 const CypressConfigUtils = require('./cypress-config-utils')
@@ -68,7 +68,42 @@ async function setupNodeEvents(on, config) {
                 const page = await setConfig.returnCypressPage(browser)
                 // Cypress will maintain focus on the Cypress tab within the browser. It's generally a good idea to bring the page to the front to interact with it.
                 await page.bringToFront()
-                await page.waitForNetworkIdle({ idleTime: config.env.networkIdleTimeout, timeout: 45000 })
+                
+                const retryMs = retryTimeout ?? config.env.networkIdleRetryTimeout
+                const idleTimeout = timeout ?? config.env.networkIdleTimeout
+
+                let timeoutId
+
+                // Create a timeout promise that resolves with null after retryMs
+                const timeoutPromise = new Promise<null>(resolve => {
+                    timeoutId = setTimeout(() => {
+                        console.log(
+                            `\ncy.puppeteer :: waitForNetworkIdle :: timeout reached after ${retryMs}ms. Network may still be active.\n`
+                        )
+                        resolve(null)
+                    }, retryMs)
+                })
+
+                // Create the retry promise - give it more time than timeoutPromise
+                const retryPromise = retry(
+                    async () => {
+                        await page.waitForNetworkIdle({ idleTime: idleTimeout, concurrency: concurrency })
+                        return true
+                    },
+                    // Forcing timeoutPromise to resolve before retryPromise
+                    { timeout: retryMs + idleTimeout }
+                ).catch(() => {
+                    // If retry fails, resolve with false instead of rejecting
+                    return false
+                })
+
+                // Race between timeout and retry - whichever resolves first wins
+                const result = await Promise.race([retryPromise, timeoutPromise])
+
+                // Clean up the timeout to prevent memory leaks
+                clearTimeout(timeoutId)
+
+                return result
             },
         },
     })

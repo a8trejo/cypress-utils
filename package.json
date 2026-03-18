@@ -10,29 +10,33 @@
     "mocha-marge": "marge cypress/results/reports/mochawesome_complete/complete-report.json -f complete-report -o cypress/results/reports/mochawesome_complete",
     "mocha-merge": "mochawesome-merge ./cypress/results/reports/mochawesome_reports/*.json -o cypress/results/reports/mochawesome_complete/complete-report.json",
     "prepare": "husky",
-    "prettier-check": "prettier --config .prettierrc 'cypress/**/*.ts' 'cypress-config-utils.js' 'cypress.config.js' --check",
-    "prettier-write": "prettier --config .prettierrc 'cypress/**/*.ts' 'cypress-config-utils.js' 'cypress.config.js' --write",
+    "prettier:check": "prettier --config .prettierrc 'cypress/**/*.ts' 'cypress-config-utils.js' 'cypress.config.js' --check",
+    "prettier:write": "prettier --config .prettierrc 'cypress/**/*.ts' 'cypress-config-utils.js' 'cypress.config.js' --write",
     "yalc:build": "npm run build && yalc publish"
   },
   "lint-staged": {
     "cypress/**/*.{ts,tsx}": [
-      "npm run prettier-write"
+      "npm run prettier:write"
     ],
     "package.json": [
       "npx sort-package-json"
     ]
   },
   "dependencies": {
-    "cypress": "^14.1.0",
+    "cypress": "^15.12.0",
     "cypress-plugin-api": "^2.11.2",
     "mysql": "github:mysqljs/mysql"
   },
   "devDependencies": {
+    "@bahmutov/cy-grep": "^3.0.1",
+    "@cypress/code-coverage": "^4.0.2",
     "@cypress/grep": "^3.1.5",
-    "@cypress/puppeteer": "^0.1.5",
+    "@cypress/puppeteer": "^0.1.8",
+    "@faker-js/faker": "^10.3.0",
     "cypress-multi-reporters": "^1.6.1",
-    "cypress-real-events": "^1.14.0",
+    "cypress-real-events": "^1.15.0",
     "dayjs": "^1.10.6",
+    "deepmerge": "^4.3.1",
     "find-test-names": "^1.29.6",
     "husky": "^9.1.7",
     "lint-staged": "^15.5.0",

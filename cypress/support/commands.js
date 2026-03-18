@@ -120,3 +120,94 @@ Cypress.Commands.add('apiGithub', (options, apiDOM = ApiLogLvl.REQUEST) => {
       })
   }
 })
+
+Cypress.Commands.add(
+    'waitForLatestIntercept',
+    (alias,options) => {
+        const {
+            failOnStatusCode = false,
+            timeout = Cypress.config('responseTimeout'),
+            assertAwaited = false,
+            verbose = false,
+        } = options ?? {}
+        const aliasSuffix = alias.replace('@', '')
+
+        const assertOnStatusCode = (statusCode) => {
+            if (failOnStatusCode) {
+                // A 304 Not Modified status should be considered due to responses cached routes (no need to retransmit the requested resources)
+                const isSuccess = (statusCode >= 200 && statusCode <= 299) || statusCode === 304
+                const assertMessage = isSuccess
+                    ? `'${alias}' :: Response has a successful status code ${statusCode}`
+                    : `'${alias}' :: Response has a failed status code ${statusCode}`
+                if (verbose) {
+                    assert.isTrue(isSuccess, assertMessage)
+                } else if (!isSuccess) {
+                    throw new Error(assertMessage)
+                }
+            }
+        }
+
+        // Reference: https://glebbahmutov.com/blog/get-all-network-calls/
+        return cy.get(`${alias}.all`, { log: false }).then(interceptions => {
+            // Each intercept has a responseWaited property that changes on each cy.wait('alias') command
+            if (interceptions.length > 1) {
+                cy.log(`**waitForLatestIntercept** :: **${alias}(${interceptions.length})** `)
+                return cy
+                    .get(`${alias}.all`, { log: verbose })
+                    .each((interception, index, $list) => {
+                        const latestIndex = $list.length - 1
+                        if (!interception.responseWaited) {
+                            // Change to log false after testing entire suite
+                            cy.wait(alias, { timeout: timeout, log: verbose })
+                            cy.get(`${alias}.all`, { timeout: timeout, log: false })
+                                .its(index, { log: false })
+                                .should(interception => {
+                                    if (assertAwaited) {
+                                        if (!interception.responseWaited) {
+                                            throw new Error(`${alias} index: ${index} should be responseWaited`)
+                                        }
+
+                                        if (interception.state != 'Complete') {
+                                            throw new Error(
+                                                `${alias} index: ${index} should be Complete but was ${interception.state}`
+                                            )
+                                        }
+                                    }
+                                    const statusCode = interception.response?.statusCode ?? 0
+                                    assertOnStatusCode(statusCode)
+                                })
+                        }
+
+                        if (index + 1 === $list.length) {
+                            // Set alias for the latest waited interception
+                            cy.get(`${alias}.all`, { timeout: timeout, log: false })
+                                .its(latestIndex, { log: false })
+                                .as(`${aliasSuffix}Latest`)
+                        }
+                    })
+                    .then(() => {
+                        // Return the latest waited index, (total might have increased)
+                        return cy.get(`${alias}Latest`, { log: false })
+                    })
+            } else {
+                // Regular wait for single request
+                return cy.wait(alias, { timeout: timeout }).then(interception => {
+                    const statusCode = interception.response?.statusCode ?? 0
+                    assertOnStatusCode(statusCode)
+                    return interception
+                })
+            }
+        })
+    }
+)
+
+Cypress.Commands.add('waitForNetworkIdle', (idleTimeout, idleRetryTimeout) => {
+    // Giving extra time to the task to avoid race conditions
+    const puppeteerTimeout = Cypress.expose('networkIdleRetryTimeout') + Cypress.expose('networkIdleTimeout')
+    const originalTimeout = Cypress.config('taskTimeout')
+    Cypress.config('taskTimeout', puppeteerTimeout)
+
+    cy.puppeteer('waitForNetworkIdle', idleTimeout, idleRetryTimeout)
+
+    Cypress.config('taskTimeout', originalTimeout)
+})
