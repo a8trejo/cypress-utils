@@ -1,10 +1,10 @@
-import { githubAPI } from '../support/apis/github-apis'
-import { ApiLogLvl } from '../support/e2e'
+import githubAPI from '../../support/apis/github-apis'
+import { ApiLogLvl } from '../../support/plugins'
 
 describe('As a github API user', () => {
     it('should be able to list my workflows and runs', () => {
         const repoPath = 'a8trejo/cypress-utils'
-        githubAPI.getWorkflows(repoPath, ApiLogLvl.DOM).then((response) => {
+        githubAPI.getWorkflows(repoPath, ApiLogLvl.DOM).then((response: any) => {
             expect(response.status).to.eq(200)
 
             githubAPI.getWorkflowsRuns(repoPath, response.body.workflows[0].id, ApiLogLvl.DOM).as('workflowsRuns')
@@ -15,11 +15,10 @@ describe('As a github API user', () => {
     it('should be able to list opened issues', () => {
         const repoPath = 'filiphric/cypress-plugin-api'
         const queryParams = {
-            "state": "open"
+            state: 'open',
         }
-        githubAPI.getIssues(repoPath, queryParams, ApiLogLvl.DOM).then((response) => {
+        githubAPI.getIssues(repoPath, queryParams, ApiLogLvl.DOM).then((response: any) => {
             expect(response.status).to.eq(200)
-
         })
     })
 })

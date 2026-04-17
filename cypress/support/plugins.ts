@@ -14,7 +14,8 @@
 // ***********************************************************
 
 // Import commands.js using ES2015 syntax:
-import './commands'
+import './commands/commands'
+import './commands/api-commands'
 import 'cypress-plugin-api'
 import '@cypress/puppeteer/support'
 import 'cypress-real-events'
@@ -22,6 +23,24 @@ import 'cypress-real-events'
 // Alternatively you can use CommonJS syntax:
 // require('./commands')
 require('@cypress/grep')()
+
+// MySQL Config options in https://github.com/mysqljs/mysql
+export type DbConfig = {
+    database: string
+    host: string
+    port: number
+    user: string
+    password: string
+}
+
+export type DbExec = {
+    dbConfig: DbConfig
+    sql: string
+}
+
+interface WindowCoverage extends Window {
+    __coverage__?: any
+}
 
 // /**
 //  * Self-descriptive options for API logging levels.
@@ -34,5 +53,10 @@ export const ApiLogLvl = {
 }
 
 Cypress.on('uncaught:exception', (err, runnable) => {
-    return false
+    if (
+        // Placeholder for an error msg
+        err.message.includes('Some expected error')
+    ) {
+        return false
+    }
 })

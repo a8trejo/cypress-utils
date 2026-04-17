@@ -23,116 +23,87 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
-import { prettyPrintJson } from 'pretty-print-json';
-import { ApiLogLvl } from '../support/e2e'
+import { prettyPrintJson } from 'pretty-print-json'
+import { ApiLogLvl } from '../plugins'
+const dayjs = require('dayjs')
+import 'cypress-file-upload'
+// @ts-ignore - cypress-iframe doesn't have type definitions
+import 'cypress-iframe'
+import type { Interception } from 'cypress/types/net-stubbing'
 
+Cypress.Commands.add(
+    'logger',
+    (
+        logMsgs: any | any[],
+        logLvl?: {
+            nodeConsole?: boolean
+            runnerConsole?: boolean
+            browserConsole?: boolean
+        }
+    ) => {
+        const { nodeConsole = true, runnerConsole = true, browserConsole = true } = logLvl ?? {}
+        const isArray = Array.isArray(logMsgs)
 
-Cypress.Commands.add('logMsg', (logMsg) => {
-    cy.task('logMsg', logMsg)
-    cy.log(logMsg);
-});
+        const stringify = (msg: any): string => {
+            if (Array.isArray(msg)) {
+                return msg
+                    .map(item => (typeof item === 'object' ? JSON.stringify(item, null, 2) : String(item)))
+                    .join('')
+            }
+            return typeof msg === 'object' ? JSON.stringify(msg, null, 2) : `${msg}`
+        }
+
+        const stringifiedMsg = stringify(logMsgs)
+        if (nodeConsole) {
+            cy.task('logMsg', stringifiedMsg)
+        }
+        if (runnerConsole) {
+            cy.log(stringifiedMsg)
+        }
+        if (browserConsole) {
+            console.log(...(isArray ? logMsgs : [logMsgs]))
+        }
+    }
+)
 
 Cypress.Commands.add('getTimeStamp', timeFormat => {
     //Ex: cy.getTimeStamp('M/DD/YYYY, h:mm:ss A')
     return new Cypress.Promise((resolve, reject) => {
-        let timeStamp = dayjs().format(timeFormat);
-        resolve(timeStamp);
-    });
-});
-
-Cypress.Commands.add('printTestMeta', (testMeta, testObject) => {
-    const metaFile = Cypress.env("metaDataPath")
-    const metaData = {...testObject, ...testMeta}
-    let testInfoArray = []
-    let retriedTest = false
-  
-    cy.task('readJsonMaybe', metaFile).then((fileObj) => {
-      
-      // If the metadata report does not exists
-      if (typeof fileObj.testInfo === 'undefined') {
-        // testInfo argument will be an array containing all of the tests info as a json object
-        fileObj.testInfo = []
-      }
-  
-      // Empty array OR all the info of the metadata report
-      testInfoArray = [...fileObj.testInfo]
-      
-      testInfoArray.forEach((test, index) => {
-        if (test.title === metaData.title) {
-          retriedTest = true
-          metaData.retried = retriedTest
-          testInfoArray[index] = metaData
-        }
-      })
-      if (retriedTest === false){
-        testInfoArray.push(metaData)
-      }
-  
-      // Updating the file object
-      fileObj.testInfo = testInfoArray
-      cy.writeFile(metaFile, fileObj)
+        let timeStamp = dayjs().format(timeFormat)
+        resolve(timeStamp)
     })
-  });
+})
 
-Cypress.Commands.add('objectToDOM', (object) => { 
+Cypress.Commands.add('objectToDOM', object => {
     let newElement = window.document.createElement('pre')
-    newElement.style.fontSize = "medium";
+    newElement.style.fontSize = 'medium'
     newElement.style.fontWeight = '650'
     newElement.style.overflow = 'auto'
 
     //newElement.innerText = JSON.stringify(object, null, 2)
-    const printOptions = {indent: 2, lineNumbers: false, quoteKeys: true}
+    const printOptions = { indent: 2, lineNumbers: false, quoteKeys: true }
     newElement.innerHTML = prettyPrintJson.toHtml(object, printOptions)
-    
-    cy.get('body').then((testRunner) => {
+
+    cy.get('body').then(testRunner => {
         testRunner.get(0).prepend(newElement)
     })
 })
 
-/**
- * API call to Github
- *
- * @param options
- * @param apiDOM - if true, the call is made with cy.api, if false, with cy.request
- */
-Cypress.Commands.add('apiGithub', (options, apiDOM = ApiLogLvl.REQUEST) => {
-  const apiOptions = {
-      ...options,
-      ...{
-          url: Cypress.env('githubApi') + options.url,
-          headers: {
-              'Accept': "application/vnd.github+json",
-              'X-GitHub-Api-Version': "2022-11-28",
-              "Authorization": `Bearer ${Cypress.env('GITHUB_TOKEN')}`,
-              ...options.headers,
-          },
-          failOnStatusCode: false,
-      },
-  }
-
-  if (apiDOM) {
-      cy.api(apiOptions).then(response => {
-          return response
-      })
-  } else {
-      cy.request(apiOptions).then(response => {
-          return response
-      })
-  }
-})
-
 Cypress.Commands.add(
     'waitForLatestIntercept',
-    (alias,options) => {
+    (
+        alias: string,
+        options?: { timeout?: number; failOnStatusCode?: boolean; assertAwaited?: boolean; verbose?: boolean }
+    ) => {
         const {
-            failOnStatusCode = false,
+            failOnStatusCode = true,
             timeout = Cypress.config('responseTimeout'),
-            assertAwaited = false,
+            assertAwaited = true,
             verbose = false,
         } = options ?? {}
         const aliasSuffix = alias.replace('@', '')
 
-        const assertOnStatusCode = (statusCode) => {
+        const assertOnStatusCode = (statusCode: number) => {
             if (failOnStatusCode) {
                 // A 304 Not Modified status should be considered due to responses cached routes (no need to retransmit the requested resources)
                 const isSuccess = (statusCode >= 200 && statusCode <= 299) || statusCode === 304
@@ -148,18 +119,18 @@ Cypress.Commands.add(
         }
 
         // Reference: https://glebbahmutov.com/blog/get-all-network-calls/
-        return cy.get(`${alias}.all`, { log: false }).then(interceptions => {
+        return cy.get<Interception[]>(`${alias}.all`, { log: false }).then(interceptions => {
             // Each intercept has a responseWaited property that changes on each cy.wait('alias') command
             if (interceptions.length > 1) {
                 cy.log(`**waitForLatestIntercept** :: **${alias}(${interceptions.length})** `)
                 return cy
-                    .get(`${alias}.all`, { log: verbose })
-                    .each((interception, index, $list) => {
+                    .get<Interception[]>(`${alias}.all`, { log: verbose })
+                    .each((interception: Interception, index, $list) => {
                         const latestIndex = $list.length - 1
                         if (!interception.responseWaited) {
                             // Change to log false after testing entire suite
                             cy.wait(alias, { timeout: timeout, log: verbose })
-                            cy.get(`${alias}.all`, { timeout: timeout, log: false })
+                            cy.get<Interception[]>(`${alias}.all`, { timeout: timeout, log: false })
                                 .its(index, { log: false })
                                 .should(interception => {
                                     if (assertAwaited) {
@@ -180,14 +151,14 @@ Cypress.Commands.add(
 
                         if (index + 1 === $list.length) {
                             // Set alias for the latest waited interception
-                            cy.get(`${alias}.all`, { timeout: timeout, log: false })
+                            cy.get<Interception[]>(`${alias}.all`, { timeout: timeout, log: false })
                                 .its(latestIndex, { log: false })
                                 .as(`${aliasSuffix}Latest`)
                         }
                     })
                     .then(() => {
                         // Return the latest waited index, (total might have increased)
-                        return cy.get(`${alias}Latest`, { log: false })
+                        return cy.get<Interception>(`${alias}Latest`, { log: false })
                     })
             } else {
                 // Regular wait for single request
@@ -210,4 +181,65 @@ Cypress.Commands.add('waitForNetworkIdle', (idleTimeout, idleRetryTimeout) => {
     cy.puppeteer('waitForNetworkIdle', idleTimeout, idleRetryTimeout)
 
     Cypress.config('taskTimeout', originalTimeout)
+})
+
+// User auth for login pop up
+Cypress.Commands.add('loginToAuthPopup', (user: string, pass: string) => {
+    cy.visit('/login', {
+        auth: {
+            username: user,
+            password: pass,
+        },
+    })
+})
+
+Cypress.Commands.add('dragDropFile', { prevSubject: true }, (subject, filePath) => {
+    // 'subject' refers to the returned Chainable JQuery HTML promise from cy.get('selector'), hence a cy.wrap is needed
+    cy.wrap(subject).attachFile(filePath, {
+        subjectType: 'drag-n-drop',
+    })
+})
+
+Cypress.Commands.add('windowOpenSelf', (targetType, alias) => {
+    cy.window().then(win => {
+        cy.stub(win, 'open')
+            .callsFake((url, target) => {
+                expect(target).to.eq(targetType)
+                // Original `win.open` method but pass the `_self` argument
+                // @ts-ignore
+                return win.open.wrappedMethod.call(win, url, '_self')
+            })
+            // @ts-ignore @prettier-ignore
+            .as(alias)
+    })
+})
+
+// Reference: https://glebbahmutov.com/blog/spy-on-clipboard-copy/
+Cypress.Commands.add('stubClipboard', (alias: string) => {
+    // Get the application's window object
+    // It should have our Location wrap object
+    cy.window()
+        .its('navigator.clipboard')
+        .then(clipboard => {
+            cy.stub(clipboard, 'writeText').as(alias)
+        })
+})
+
+Cypress.Commands.add('realClear', { prevSubject: true }, (subject, options?: { delay?: number; log?: boolean }) => {
+    const { delay = 50, log = true } = options ?? {}
+
+    return cy.wrap(subject, { log: false }).then($e => {
+        const selector = ($e as any).selector || 'unknown'
+        if (log) cy.log(`realClear :: ${selector}`)
+
+        const innerValue = `${$e.attr('value')}`
+        if (innerValue !== '') {
+            cy.wrap($e, { log: false }).click().focus({ log: false })
+
+            // Use realType with backspace repeated for each character
+            // This properly triggers React's onChange events
+            return cy.wrap($e).realType('{backspace}'.repeat(innerValue.length), { delay, log: false })
+        }
+        return cy.wrap($e, { log: false })
+    })
 })

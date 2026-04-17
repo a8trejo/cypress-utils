@@ -1,0 +1,28 @@
+{
+    "compilerOptions": {
+        "target": "es2017",
+        "lib": ["es2017", "dom"],
+        "types": ["cypress", "node", "cypress-real-events", "@cypress/puppeteer/support"],
+        "strict": true,
+        "allowJs": true,
+        "noEmit": true,
+        "forceConsistentCasingInFileNames": false,
+        "skipLibCheck": true,
+        "moduleResolution": "nodenext",
+        "module": "NodeNext",
+        "esModuleInterop": true
+    },
+    "include": [
+        "**/src/*.ts",
+        "**/src/**/*.ts",
+        "**/support/*.ts",
+        "**/support/**/*.ts",
+        "**/fixtures/**/*.ts", 
+        "support/cypress.d.ts",
+        "../node_modules/@cypress/grep/src/index.d.ts",
+        "support/utils/commands.ts",
+        "cypress/support/api/api-commands.ts",
+        "support/utils/misc.ts",
+    ],
+    "exclude": ["./node_modules", "../.yalc", "../node_modules/@roo-dev", "./node_modules/@roo-dev"]
+}

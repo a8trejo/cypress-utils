@@ -1,16 +1,14 @@
 const { defineConfig } = require('cypress')
 const fs = require('fs-extra')
-import { setup } from '@cypress/puppeteer'
-
-const FactorySeleniumEasy = require('./cypress/fixtures/SeleniumEasyFactory')
-const CypressConfigUtils = require('./cypress-config-utils')
-const setConfig = new CypressConfigUtils()
+import type { Browser as PuppeteerBrowser } from 'puppeteer-core'
+import { setup, retry } from '@cypress/puppeteer'
+import configUtils from './config-utils'
 
 module.exports = defineConfig({
     e2e: {
         morgan: false,
         watchForFileChanges: false,
-        specPattern: ['cypress/e2e/**/*.cy.{js,jsx,ts,tsx}'],
+        specPattern: ['cypress/src/**/*.cy.{js,jsx,ts,tsx}'],
         pageLoadTimeout: 90000,
         responseTimeout: 45000,
         defaultCommandTimeout: 10000,
@@ -20,7 +18,7 @@ module.exports = defineConfig({
         screenshotsFolder: 'cypress/results/screenshots',
         videosFolder: 'cypress/results/videos',
         downloadsFolder: 'cypress/results/downloads',
-        supportFile: 'cypress/support/e2e.js',
+        supportFile: 'cypress/support/plugins.ts',
         reporter: 'cypress-multi-reporters',
         reporterOptions: {
             configFile: 'cypress/config/reporter-configs.json',
@@ -58,21 +56,26 @@ module.exports = defineConfig({
     },
 })
 
-async function setupNodeEvents(on, config) {
+async function setupNodeEvents(on: Cypress.PluginEvents, config: Cypress.PluginConfigOptions) {
     // Utilize the Puppeteer browser instance and the Puppeteer API to interact with and automate the browser
     setup({
         on,
         onMessage: {
-            async waitForNetworkIdle(browser) {
+            async waitForNetworkIdle(
+                browser: PuppeteerBrowser,
+                timeout: number,
+                retryTimeout: number,
+                concurrency: number
+            ) {
                 // Utilize the retry since the page may not have opened and loaded by the time this runs
-                const page = await setConfig.returnCypressPage(browser)
+                const page = await configUtils.returnCypressPage(browser)
                 // Cypress will maintain focus on the Cypress tab within the browser. It's generally a good idea to bring the page to the front to interact with it.
                 await page.bringToFront()
-                
+
                 const retryMs = retryTimeout ?? config.env.networkIdleRetryTimeout
                 const idleTimeout = timeout ?? config.env.networkIdleTimeout
 
-                let timeoutId
+                let timeoutId: NodeJS.Timeout | undefined
 
                 // Create a timeout promise that resolves with null after retryMs
                 const timeoutPromise = new Promise<null>(resolve => {
@@ -107,21 +110,21 @@ async function setupNodeEvents(on, config) {
             },
         },
     })
-    const envKey = config.env.envKey || 'local'
+    const envKey = config.env.envKey ?? 'local'
     config.env['envKey'] = envKey
     let repoUsers = config.env.repoUsers ?? 'local-users'
 
     if (envKey !== 'local') {
-        config = setConfig.getConfigByFile(envKey, config)
+        config = configUtils.getConfigByFile(envKey, config)
     }
 
     require('@cypress/grep/src/plugin')(config)
 
     // Once a reporter is chosen, pass the path dynamically
-    setConfig.cleanReports('./cypress/results/reports')
-    fixturesFactory(config)
+    configUtils.cleanReports('./cypress/results/reports')
 
-    config = setConfig.getSecretsByKey(envKey, config, repoUsers)
+    // Revisit with sh file instead
+    // config = configUtils.getSecretsByKey(envKey, config, repoUsers)
 
     on('task', {
         logMsg(msg) {
@@ -135,17 +138,26 @@ async function setupNodeEvents(on, config) {
             return {}
         },
         dbExec({ sql, dbConfig }) {
-            return setConfig.dbQuery(sql, dbConfig)
+            return configUtils.dbQuery(sql, dbConfig)
         },
         readPDF(pdfPath) {
-            return setConfig.readPdf(pdfPath)
+            return configUtils.readPdf(pdfPath)
+        },
+        deleteFile(filePath: string) {
+            if (fs.existsSync(filePath)) {
+                fs.unlinkSync(filePath)
+                return null
+            }
+            return null
+        },
+        deleteFolder(folderPath: string) {
+            const localPath = `cypress/${folderPath}`
+            if (fs.existsSync(localPath)) {
+                fs.rmdirSync(localPath, { recursive: true })
+            }
+            return null
         },
     })
 
     return config
-}
-
-function fixturesFactory(config) {
-    const cypressEnv = { ...config.env }
-    FactorySeleniumEasy.fixtureFactory(cypressEnv)
 }

@@ -1,0 +1,33 @@
+{
+    "plugins": [
+      "cypress", "mocha", "chai-friendly", "eslint-plugin-sonarjs"
+    ],
+    "extends": [
+      "plugin:cypress/recommended", "plugin:sonarjs/recommended-legacy"
+    ],
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+      "ecmaVersion": 8,
+      "ecmaFeatures": {
+        "jsx": true,
+        "modules": true
+      },
+      "sourceType": "module"
+    },
+    "rules": {
+        "cypress/no-assigning-return-values": "error",
+        "cypress/no-unnecessary-waiting": "warn",
+        "cypress/assertion-before-screenshot": "warn",
+        "cypress/no-force": "off",
+        "cypress/no-async-tests": "error",
+        "cypress/no-pause": "error",
+        "cypress/unsafe-to-chain-command": "off",
+        "mocha/no-exclusive-tests": "error",
+        "mocha/no-skipped-tests": "warn",
+        "sonarjs/public-static-readonly": "off",
+        "sonarjs/todo-tag": "off",
+        "sonarjs/pseudo-random": "off",
+        "sonarjs/no-nested-functions": "off",
+        "sonarjs/no-nested-template-literals": "off"
+      }
+  }
