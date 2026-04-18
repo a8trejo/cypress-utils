@@ -18,14 +18,14 @@ const cleanReports = (reportPath: string) => {
 }
 
 /**
- * Reads the configurations of the cypress/config/roo_*.json files depending on envKey
+ * Reads the configurations of the cypress/config/cypress_*.json files depending on envKey
  * @param envKey: ('local', 'dev', 'stage', 'prod')
  * @param config: (The cypress configuration passed by the cypress.config.ts file in setupNodeEvents)
  *
  * @return config (The updated cypress configuration depending on the environment)
  */
 const getConfigByFile = (envKey: string, config: Cypress.PluginConfigOptions) => {
-    let fileName = `roo_${envKey}.json`
+    let fileName = `cypress_${envKey}.json`
     console.log('---------------------------------------------------------------------------')
     console.log(`cypress-env.ts :: getConfigByFile :: Config file: ${fileName}`)
     console.log('---------------------------------------------------------------------------')

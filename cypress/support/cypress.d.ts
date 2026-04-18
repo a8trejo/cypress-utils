@@ -57,13 +57,6 @@ declare namespace Cypress {
         containsMatch(exactMatch: string): Cypress.Chainable<any>
 
         /**
-         * Scrolls an element underneath the Roo NavBar Header
-         * @param options: Same parameters as cy.scrollIntoView()
-         * @example cy.get("[type='checkbox']").rooScroll()
-         */
-        rooScroll(options?: Partial<Cypress.ScrollIntoViewOptions>): Cypress.Chainable<any>
-
-        /**
          * Scrolls into an element using the element's bounding client rect
          * @param options: Same parameters as cy.scrollTo() plus optional offset
          * @example cy.get("[type='checkbox']").scroll2Element()
