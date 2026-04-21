@@ -15,6 +15,7 @@
     "prepare": "husky",
     "prettier:check": "prettier --config .prettierrc 'cypress/**/*.ts' 'config-utils.ts' 'cypress.config.ts' --check",
     "prettier:write": "prettier --config .prettierrc 'cypress/**/*.ts' 'config-utils.ts' 'cypress.config.ts' --write",
+    "secrets:template": "cp cypress/config/secrets-example.json cypress/config/secrets.json",
     "yalc:build": "npm run build && yalc publish"
   },
   "lint-staged": {

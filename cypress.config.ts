@@ -123,8 +123,7 @@ async function setupNodeEvents(on: Cypress.PluginEvents, config: Cypress.PluginC
     // Once a reporter is chosen, pass the path dynamically
     configUtils.cleanReports('./cypress/results/reports')
 
-    // Revisit with sh file instead
-    // config = configUtils.getSecretsByKey(envKey, config, repoUsers)
+    config = configUtils.getSecretsByKey(envKey, config, repoUsers)
 
     on('task', {
         logMsg(msg) {

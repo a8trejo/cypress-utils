@@ -6,9 +6,8 @@ In order to run the automated test suite, please follow the steps described belo
 
 1. If this is the first time cloning the repository, execute the following command in the project's terminal: `npm install`
 
-2. Execute the command `cp secrets-example.env.sh secrets.env.sh` and replace the content on `secrets.env.sh` with your proper credentials
-
-3. Export the secrets in the above file running `source secrets.env.sh`
+2. Execute the command `cp cypress/config/secrets-example.json cypress/config/secrets.json` and replace the content in `cypress/config/secrets.json` with your proper credentials
+  - If you want to record your local runs to the cloud, run `source cypress/config/set-key.sh`
 
 3. Run one of the commands below depending on which environment needs to be tested  
    - To execute the tests using the Test Runner (does not generate reports)  

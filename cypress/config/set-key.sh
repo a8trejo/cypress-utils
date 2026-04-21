@@ -1,0 +1,1 @@
+export CYPRESS_RECORD_KEY=$(grep 'CYPRESS_RECORD_KEY' cypress/config/secrets.json | sed 's/.*: "\(.*\)".*/\1/')

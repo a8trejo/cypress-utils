@@ -38,45 +38,47 @@ const getConfigByFile = (envKey: string, config: Cypress.PluginConfigOptions) =>
 }
 
 /**
- * Reads the secrets stored in process.env by either `secrets.json` or `cypress/config/aws-secrets.sh`
+ * Reads the secrets stored in `cypress/config/secrets.json`
  * @param envKey: ('local', 'dev', 'stage', 'prod'), reads the respective secrets of the environment
  * @param config: (The cypress configuration passed by the cypress.config.ts file in setupNodeEvents)
  *
  * @return config (The updated cypress configuration now including the environment secrets)
  */
 const getSecretsByKey = (envKey: string, config: Cypress.PluginConfigOptions, repoUsers: string) => {
-    if (fs.existsSync('secrets.json')) {
+    const secretsPath = 'cypress/config/secrets.json'
+    if (fs.existsSync(secretsPath)) {
         config.env['envKey'] = envKey
-        envKey = envKey === 'ci' ? 'DEV' : envKey.toUpperCase()
-        repoUsers = repoUsers.split('-')[1].toUpperCase()
-        const envJSON = fs.readFileSync('secrets.json')
-        const localSecrets = JSON.parse(envJSON)
+        const envJSON = fs.readFileSync(secretsPath)
+        const secrets = JSON.parse(envJSON)
 
-        // All secrets with an environment suffix ex: TECH_USER_CA_SF_DEV, are set as a Cypress environment variable withouth the suffix ex: TECH_USER_CA_SF
-        Object.keys(localSecrets).forEach(secret => {
-            const envIndex = secret.lastIndexOf(`_${envKey}`)
-            const cypressIndex = secret.indexOf(`CYPRESS_`)
-            if (envIndex !== -1) {
-                const secretName = secret.substring(0, envIndex)
-                const repoIndex = secretName.lastIndexOf(`_${repoUsers}`)
-
-                // Add secrets if they are not already in the config and if the secret name doesn't specify a repo, or specifies REACT
-                if ((repoIndex === -1 || repoUsers === 'REACT') && !config.env.hasOwnProperty(secretName)) {
-                    config.env[secretName] = localSecrets[secret]
-                } else if (repoUsers === 'NODE' && repoIndex !== -1) {
-                    // All secrets related to NODE users, ex: H_USER_MSG_TECHS_NODE gets renamed as H_USER_MSG_TECHS
-                    const repoSecretName = secretName.substring(0, repoIndex)
-                    config.env[repoSecretName] = localSecrets[secret]
+        // Add Cypress Dashboard secrets
+        if (secrets.cypress && typeof secrets.cypress === 'object') {
+            Object.keys(secrets.cypress).forEach(key => {
+                if (key === 'CYPRESS_DASHBOARD_ID') {
+                    config.projectId = secrets.cypress[key]
                 }
-                // Secrets with no envKey should be added to the config.env
-            } else if (cypressIndex !== -1) {
-                const secretName = secret.replace('CYPRESS_', '')
-                config.env[secretName] = localSecrets[secret]
+            })
+        }
+
+        // Add top-level secrets (Heroku)
+        Object.keys(secrets).forEach(key => {
+            if (typeof secrets[key] === 'string' && key.startsWith('CYPRESS_')) {
+                config.env[key] = secrets[key]
             }
         })
+
+        // Add environment-specific secrets (e.g., local, dev)
+        if (secrets[envKey] && typeof secrets[envKey] === 'object') {
+            Object.keys(secrets[envKey]).forEach(key => {
+                if (key.startsWith('CYPRESS_')) {
+                    config.env[key] = secrets[envKey][key]
+                }
+            })
+        }
+
         return config
     } else {
-        throw new Error('Credentials are Empty! Secrets not found, please run the aws-secrets.sh script')
+        throw new Error(`Credentials are Empty! Secrets not found at ${secretsPath}`)
     }
 }
 
